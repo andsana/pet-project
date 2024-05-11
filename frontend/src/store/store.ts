@@ -1,7 +1,10 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
+import { fileReducer } from '../admin/page/adminPages/model/imageUploadSlice.ts';
 
-const rootReducer = combineReducers({});
+const rootReducer = combineReducers({
+  file: fileReducer,
+});
 
 export const store = configureStore({
   reducer: rootReducer,
