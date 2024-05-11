@@ -9,21 +9,24 @@ const NestedMenuSchema = new Schema({
   },
 });
 
-const NavbarItemSchema = new Schema({
-  nameNav: {
-    type: String,
-    required: true,
+const NavbarItemSchema = new Schema(
+  {
+    nameNav: {
+      type: String,
+      required: true,
+    },
+    link: {
+      type: String,
+      default: null,
+    },
+    isDrop: {
+      type: Boolean,
+      default: false,
+    },
+    nestedMenu: [NestedMenuSchema],
   },
-  link: {
-    type: String,
-    default: null,
-  },
-  isDrop: {
-    type: Boolean,
-    default: false,
-  },
-  nestedMenu: [NestedMenuSchema],
-});
+  { versionKey: false },
+);
 
 const NavbarItem = model('NavbarItem', NavbarItemSchema);
 export default NavbarItem;

@@ -12,3 +12,15 @@ export interface Block {
 export interface ModelType {
   [key: string]: any;
 }
+
+export interface NavbarItemFields {
+  nameNav: string;
+  link: string;
+  isDrop: boolean;
+  nestedMenu: [
+    {
+      nestedNameNav: string;
+      nestedLink: string;
+    },
+  ];
+}
