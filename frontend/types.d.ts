@@ -13,4 +13,24 @@ export interface Components {
       placeholder: string;
     };
   };
+  navbarItems: {
+    fields: {
+      nameNav: {
+        type: string;
+        fieldName: string;
+        value: string;
+        typeField: string;
+        required: boolean;
+        placeholder: string;
+      };
+      link: {
+        type: string;
+        fieldName: string;
+        value: string;
+        typeField: string;
+        required: boolean;
+        placeholder: string;
+      };
+    };
+  }[];
 }

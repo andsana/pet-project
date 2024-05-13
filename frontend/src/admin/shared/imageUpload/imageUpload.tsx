@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Grid, TextField } from '@mui/material';
 import { fileUpload } from '../../page/adminPages/api/imageUploadThunks';
-import { useAppDispatch } from '../../../store/hooks.ts';
+import { useAppDispatch } from '../../../store/hooks';
 
 interface Props {
   name: string;

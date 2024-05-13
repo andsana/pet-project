@@ -1,14 +1,5 @@
 import { model, Schema } from 'mongoose';
 
-const NestedMenuSchema = new Schema({
-  nestedNameNav: {
-    type: String,
-  },
-  nestedLink: {
-    type: String,
-  },
-});
-
 const NavbarItemSchema = new Schema(
   {
     nameNav: {
@@ -19,11 +10,6 @@ const NavbarItemSchema = new Schema(
       type: String,
       default: null,
     },
-    isDrop: {
-      type: Boolean,
-      default: false,
-    },
-    nestedMenu: [NestedMenuSchema],
   },
   { versionKey: false },
 );

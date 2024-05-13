@@ -31,14 +31,28 @@ export const components: Components[] = [
         required: true,
         placeholder: 'Put url',
       },
-      navbarItems: {
-        type: 'array',
-        fieldName: 'navbarItems',
-        value: '',
-        typeField: 'short-text',
-        required: true,
-        placeholder: 'Select navbar items',
-      },
     },
+    navbarItems: [
+      {
+        fields: {
+          nameNav: {
+            type: 'string',
+            fieldName: 'nameNav',
+            value: '',
+            typeField: 'short-text',
+            required: true,
+            placeholder: 'Enter item name',
+          },
+          link: {
+            type: 'string',
+            fieldName: 'link',
+            value: '',
+            typeField: 'short-text',
+            required: false,
+            placeholder: 'Enter item link',
+          },
+        },
+      },
+    ],
   },
 ];

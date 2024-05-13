@@ -31,8 +31,6 @@ headerRouter.post('/', logosUpload.single('logo'), async (req, res, next) => {
         const navbarItem = new NavbarItem({
           nameNav: item.nameNav,
           link: item.link,
-          isDrop: item.isDrop,
-          nestedMenu: item.nestedMenu,
         });
 
         return navbarItem.save();
