@@ -10,7 +10,7 @@ import { createPage } from '../api/adminCreatePageThunks';
 import InputItem from '../../../widgets/adminPageCreateForm/InputItem';
 import { Field, IPage } from '../model/types';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../../../store/hooks.ts';
+import { useAppDispatch } from '../../../../store/hooks';
 
 interface Fields {
   [key: string]: Field;

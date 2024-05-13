@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { TextField } from '@mui/material';
-import { useAppSelector } from '../../../store/hooks.ts';
+import { useAppSelector } from '../../../store/hooks';
 import { selectImageLocation } from '../../page/adminPages/model/imageUploadSlice';
 import { Field } from '../../page/adminPages/model/types';
 import ImageUpload from '../../shared/imageUpload/imageUpload';
