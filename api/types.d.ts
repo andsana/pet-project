@@ -30,3 +30,14 @@ export interface AboutAsBlockMutation {
   description: string;
   image: string | null;
 }
+
+export interface OurValuesBlockMutation {
+  title: string;
+  cards: OurValuesBlockCard[];
+}
+
+interface OurValuesBlockCard {
+  cardTitle: string;
+  cardText: string;
+  cardIcon: string | null;
+}
