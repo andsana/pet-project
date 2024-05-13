@@ -24,3 +24,9 @@ export interface NavbarItemFields {
     },
   ];
 }
+
+export interface AboutAsBlockMutation {
+  title: string;
+  description: string;
+  image: string | null;
+}
