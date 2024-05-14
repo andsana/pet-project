@@ -12,7 +12,6 @@ const AboutAsBlockSchema = new Schema(
     },
     image: {
       type: String,
-      required: true,
     },
   },
   { versionKey: false },

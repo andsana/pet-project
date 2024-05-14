@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 
 interface ComponentField {
   fieldName: string;
@@ -13,6 +13,7 @@ interface Component {
   displayName: string;
   image: string;
   fields: { [key: string]: ComponentField };
+  cards?: { [key: string]: ComponentField }[];
 }
 
 const componentFieldSchema = new Schema<ComponentField>({
@@ -23,7 +24,12 @@ const componentFieldSchema = new Schema<ComponentField>({
   placeholder: { type: String, required: true },
 });
 
-const componentsSchema = new mongoose.Schema({
+const cardSchema = new Schema({
+  type: Map,
+  of: componentFieldSchema,
+});
+
+const componentsSchema = new Schema({
   nameModel: {
     type: String,
     required: true,
@@ -37,7 +43,9 @@ const componentsSchema = new mongoose.Schema({
     default: 'Some url to image',
   },
   fields: { type: Map, of: componentFieldSchema },
+  // cards: [cardSchema],
+  cards: { type: [Map], of: componentFieldSchema },
 });
 
-const ComponentModel = mongoose.model<Component & Document>('ComponentModel', componentsSchema);
+const ComponentModel = model<Component & Document>('ComponentModel', componentsSchema);
 export default ComponentModel;

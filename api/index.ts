@@ -7,6 +7,7 @@ import pageCreateRouter from './routes/pageCreateRouter';
 import headerRouter from './routes/headerRouter';
 import imageUploadRouter from './routes/imageUploadRouter';
 import aboutAsBlockRouter from './routes/aboutAsBlockRouter';
+import ourValuesBlockRouter from './routes/ourValuesBlockRouter';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/page', pageCreateRouter);
 app.use('/header', headerRouter);
 app.use('/upload-image', imageUploadRouter);
 app.use('/about-as', aboutAsBlockRouter);
+app.use('/about-as', ourValuesBlockRouter);
 
 const run = async () => {
   await mongoose.connect(config.mongoose.db);

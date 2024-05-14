@@ -8,24 +8,27 @@ const ourValuesBlockRouter = express.Router();
 
 ourValuesBlockRouter.post('/', imagesUpload.single('image'), async (req, res, next) => {
   try {
-    const title = req.body.title;
-    const cards = [];
+    const { title, cards } = req.body;
 
-    for (let i = 0; i <= 2; i++) {
-      const cardData: OurValuesBlockCard = {
-        cardTitle: req.body[`cardTitle${i}`],
-        cardText: req.body[`cardText${i}`],
-        cardIcon: req.file ? req.file.filename : null,
-      };
-
-      cards.push(cardData);
+    if (!Array.isArray(cards)) {
+      return res.status(422).send({ error: 'Cards should be an array' });
     }
 
-    const ourValuesBlockData: OurValuesBlockMutation = {
-      title: title,
-      cards: cards,
+    if (cards.length > 3) {
+      return res.status(422).send({ error: 'Cannot exceed three cards' });
+    }
+
+    const processedCards = cards.map((card) => ({
+      ...card,
+      cardIcon: req.file ? req.file.filename : card.cardIcon,
+    }));
+
+    const ourValuesBlockData = {
+      title,
+      cards: processedCards,
     };
 
+    await OurValuesBlock.deleteMany({});
     const result = new OurValuesBlock(ourValuesBlockData);
     await result.save();
 

@@ -10,6 +10,13 @@ pageCreateRouter.post('/', async (req, res, next) => {
   try {
     const { name, url } = req.body;
 
+    const existingPage = await Page.findOne({ $or: [{ name }, { url }] });
+    if (existingPage) {
+      return res.status(409).send({
+        error: 'Page with this name or URL already exists',
+      });
+    }
+
     const newPage = {
       name,
       url,
@@ -20,10 +27,11 @@ pageCreateRouter.post('/', async (req, res, next) => {
     const blocks: Block[] = req.body.blocks;
 
     for (const block of blocks) {
-      const modelName = modelMapping[block.nameComponent.toLocaleLowerCase()];
+      const modelName = modelMapping[block.nameComponent];
 
       if (modelName) {
-        const componentInstance = new modelMapping[block.nameComponent.toLocaleLowerCase()](block.content);
+        await modelName.deleteMany({});
+        const componentInstance = new modelMapping[block.nameComponent](block.content);
         const id = await componentInstance.save();
         newPage.componentType.push(block.nameComponent);
         newPage.components.push(id._id);

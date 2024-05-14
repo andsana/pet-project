@@ -5,6 +5,6 @@ import AboutAsBlock from '../models/aboutAsBlock/AboutAsBlock';
 
 export const modelMapping: ModelType = {
   header: Header,
-  ourValuesBlock: OurValuesBlock,
+  OurValuesBlock: OurValuesBlock,
   AboutAsBlock: AboutAsBlock,
 };

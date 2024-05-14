@@ -13,6 +13,7 @@ aboutAsBlockRouter.post('/', imagesUpload.single('image'), async (req, res, next
       image: req.file ? req.file.filename : null,
     };
 
+    await AboutAsBlock.deleteMany({});
     const result = new AboutAsBlock(aboutAsBlockData);
     await result.save();
 
