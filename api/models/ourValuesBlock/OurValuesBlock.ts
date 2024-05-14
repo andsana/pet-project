@@ -14,7 +14,7 @@ const OurValuesBlockSchema = new Schema(
             type: String,
             required: true,
           },
-          cardText: {
+          cardDescription: {
             type: String,
             required: true,
           },

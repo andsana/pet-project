@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { fileUpload } from '../api/imageUploadThunks';
-import { RootState } from '../../../../store/store.ts';
+import { RootState } from '../../../../store/store';
 
 interface ImageUploadState {
   imageLocation: string;

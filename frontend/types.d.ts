@@ -1,36 +1,23 @@
-export interface Components {
+export interface ComponentField {
+  type: string;
+  fieldName: string;
+  value: string | File;
+  typeField: string;
+  required: boolean;
+  placeholder: string;
+}
+
+export interface Component {
   id: string;
   image: string;
-  name: string;
+  nameModel: string;
   displayName: string;
   fields: {
-    [key: string]: {
-      type: string;
-      fieldName: string;
-      value: string | File;
-      typeField: string;
-      required: boolean;
-      placeholder: string;
+    [key: string]: ComponentField;
+  };
+  card?: {
+    fields: {
+      [key: string]: ComponentField;
     };
   };
-  navbarItems: {
-    fields: {
-      nameNav: {
-        type: string;
-        fieldName: string;
-        value: string;
-        typeField: string;
-        required: boolean;
-        placeholder: string;
-      };
-      link: {
-        type: string;
-        fieldName: string;
-        value: string;
-        typeField: string;
-        required: boolean;
-        placeholder: string;
-      };
-    };
-  }[];
 }

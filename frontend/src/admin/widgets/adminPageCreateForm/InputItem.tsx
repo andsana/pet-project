@@ -9,19 +9,20 @@ interface Input {
   field: Field;
   index: number;
   value: string | File;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void;
-  imageInputChange: (location: string, index: number) => void;
+  cardIndex?: number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number, cardIndex?: number) => void;
+  imageInputChange: (location: string, index: number, cardIndex?: number) => void;
 }
 
-const InputItem: React.FC<Input> = ({ field, onChange, index, imageInputChange, value }) => {
+const InputItem: React.FC<Input> = ({ field, onChange, index, value, cardIndex, imageInputChange }) => {
   const imageLocation = useAppSelector(selectImageLocation);
 
   useEffect(() => {
-    imageInputChange(imageLocation, index);
-  }, [imageLocation, imageInputChange, index]);
+    imageInputChange(imageLocation, index, cardIndex);
+  }, [imageLocation, imageInputChange, index, cardIndex]);
 
-  const onComponentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e, index);
+  const onComponentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    onChange(e, index, cardIndex);
   };
 
   switch (field.typeField) {
@@ -50,7 +51,7 @@ const InputItem: React.FC<Input> = ({ field, onChange, index, imageInputChange, 
         />
       );
     case 'image':
-      return <ImageUpload name={'image'} />;
+      return <ImageUpload name={field.fieldName} />;
     default:
       console.error(`Invalid field type: ${field.typeField}`);
       return null;

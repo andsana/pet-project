@@ -24,11 +24,6 @@ const componentFieldSchema = new Schema<ComponentField>({
   placeholder: { type: String, required: true },
 });
 
-const cardSchema = new Schema({
-  type: Map,
-  of: componentFieldSchema,
-});
-
 const componentsSchema = new Schema({
   nameModel: {
     type: String,
@@ -43,7 +38,6 @@ const componentsSchema = new Schema({
     default: 'Some url to image',
   },
   fields: { type: Map, of: componentFieldSchema },
-  // cards: [cardSchema],
   cards: { type: [Map], of: componentFieldSchema },
 });
 

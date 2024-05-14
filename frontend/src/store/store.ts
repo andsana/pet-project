@@ -1,7 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
-import { fileReducer } from '../admin/page/adminPages/model/imageUploadSlice.ts';
-import { pageReducer } from '../admin/page/adminPages/model/adminCreatePageSlice.ts';
+import { fileReducer } from '../admin/page/adminPages/model/imageUploadSlice';
+import { pageReducer } from '../admin/page/adminPages/model/adminCreatePageSlice';
 
 const rootReducer = combineReducers({
   file: fileReducer,

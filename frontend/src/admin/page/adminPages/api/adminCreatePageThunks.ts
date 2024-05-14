@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { CreatePage, OnePageResponse } from '../model/types';
-import axiosApi from '../../../../app/axiosApi.ts';
+import axiosApi from '../../../../app/axiosApi';
 
 export const createPage = createAsyncThunk<string, CreatePage>('page/create', async (data) => {
   const response = await axiosApi.post('/page', data);

@@ -8,7 +8,7 @@ import InputBase from '@mui/material/InputBase';
 import { components } from '../../../../app/constants/components';
 import { createPage } from '../api/adminCreatePageThunks';
 import InputItem from '../../../widgets/adminPageCreateForm/InputItem';
-import { Field, IPage } from '../model/types';
+import { Field, IPage, Card, CreatePage } from '../model/types';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../../../store/hooks';
 
@@ -30,35 +30,127 @@ export const AdminCreatePage = () => {
     const selectComponent = components[index];
     setChooseComponentName((prevState) => [...prevState, selectComponent.displayName]);
     setBlocks((prevState) => [...prevState, selectComponent.fields]);
-    const oneFieldObject = [];
 
+    const combinedObject: {
+      [key: string]: string | File | Card[];
+    } = {};
     for (const key in selectComponent.fields) {
       const value = selectComponent.fields[key as keyof typeof selectComponent.fields];
-      const item = { [key]: value.value };
-      oneFieldObject.push(item);
+      combinedObject[key] = value.value;
     }
 
-    const combinedObject = Object.assign({}, ...oneFieldObject);
-    setPages((prevState) => [...prevState, { nameComponent: selectComponent.name, content: combinedObject }]);
+    if (selectComponent.card) {
+      combinedObject['cards'] = [];
+    }
+
+    setPages((prevState) => [...prevState, { nameComponent: selectComponent.nameModel, content: combinedObject }]);
     setOpenModal(false);
   };
 
-  const onChangeComponents = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const onChangeComponents = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
     const { name, value } = e.target;
     const data = [...page];
     data[index].content[name] = value;
+  };
+
+  const imageInputChange = (location: string, blockIndex: number, cardIndex?: number) => {
+    const data = [...page];
+
+    if (cardIndex !== undefined) {
+      (data[blockIndex].content.cards as Card[])[cardIndex]['image'] = location;
+    } else {
+      data[blockIndex].content['image'] = location;
+    }
+
     setPages(data);
   };
 
-  const imageInputChange = (location: string, index: number) => {
+  const addCard = (index: number) => {
     const data = [...page];
-    data[index].content['image'] = location;
+
+    console.log('data[index].nameComponent =', data[index].nameComponent);
+
+    console.log('data before adding card:', JSON.stringify(data, null, 2));
+
+    const component = components.find((comp) => comp.nameModel === data[index].nameComponent);
+    console.log('component:', component);
+
+    if (!component?.card?.fields) {
+      console.error('No card fields found for the component:', data[index].nameComponent);
+      return;
+    }
+
+    const newCard = Object.entries(component.card.fields).reduce((acc, [key, cardField]) => {
+      acc[key] = cardField.value;
+      return acc;
+    }, {} as Card);
+
+    console.log('newCard:', newCard);
+
+    if (!data[index].content.cards) {
+      data[index].content.cards = [];
+    }
+
+    (data[index].content.cards as Card[]).push(newCard);
+
+    console.log('data after adding card:', JSON.stringify(data, null, 2));
+
     setPages(data);
+  };
+
+  const onChangeCardContent = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    blockIndex: number,
+    cardIndex?: number,
+  ) => {
+    const { name, value } = e.target;
+    const data = [...page];
+    if (cardIndex !== undefined) {
+      (data[blockIndex].content.cards as Card[])[cardIndex][name] = value;
+      console.log('data[blockIndex].content.cards', data[blockIndex].content.cards);
+      console.log(
+        ' (data[blockIndex].content.cards as Card[])[cardIndex]',
+        (data[blockIndex].content.cards as Card[])[cardIndex],
+      );
+    }
+    console.log('blockIndex', blockIndex); //1
+    console.log('cardIndex', cardIndex); //0
+    console.log('name', name); // title
+    console.log('value', value); //v
+    console.log('data', data); //пустой массив карточек
+    setPages(data);
+    console.log('data2', data);
+  };
+
+  const areAllRequiredFieldsFilled = (
+    fields: Fields,
+    content: {
+      [key: string]: string | File | Card[];
+    },
+  ) => {
+    for (const key in fields) {
+      const field = fields[key];
+      if (field.required && !content[key]) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const areAllCardFieldsFilled = (cards: Card[]) => {
+    for (const card of cards) {
+      for (const key in card) {
+        if (!card[key]) {
+          return false;
+        }
+      }
+    }
+    return true;
   };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = { name, url, blocks: page };
+    const result: CreatePage = { name, url, blocks: page };
     dispatch(createPage(result));
     navigate('/admin/pages');
   };
@@ -74,7 +166,7 @@ export const AdminCreatePage = () => {
             variant="contained"
             sx={{ backgroundColor: '#000', color: '#fff', borderColor: '#000', width: '50%', alignSelf: 'center' }}
           >
-            Добавить компонент
+            Add Component
           </Button>
         )}
       </Box>
@@ -91,7 +183,7 @@ export const AdminCreatePage = () => {
                 </Box>
                 {Object.keys(block).map((key: keyof Fields) => {
                   const input = block[key];
-                  const value = page[index].content[key];
+                  const value = page[index].content[key] as string;
                   return (
                     <Grid item sx={{ mb: 1 }} key={`${index}-${key}`}>
                       <InputItem
@@ -104,6 +196,42 @@ export const AdminCreatePage = () => {
                     </Grid>
                   );
                 })}
+                {page[index].content.cards && (
+                  <>
+                    {areAllRequiredFieldsFilled(block, page[index].content) && (
+                      <Button
+                        variant="contained"
+                        onClick={() => addCard(index)}
+                        disabled={!areAllCardFieldsFilled(page[index].content.cards as Card[])}
+                      >
+                        Add Card
+                      </Button>
+                    )}
+                    {(page[index].content.cards as Card[]).map((card, cardIndex) => (
+                      <Box
+                        key={cardIndex}
+                        sx={{ border: '1px solid gray', borderRadius: '10px', padding: 1, marginBottom: 1 }}
+                      >
+                        {Object.keys(card).map((key) => {
+                          const cardField = components.find((comp) => comp.nameModel === page[index].nameComponent)
+                            ?.card?.fields[key];
+                          return cardField ? (
+                            <Grid item sx={{ mb: 1 }} key={`${index}-${cardIndex}-${key}`}>
+                              <InputItem
+                                field={cardField}
+                                index={index}
+                                cardIndex={cardIndex}
+                                value={card[key] as string}
+                                onChange={onChangeCardContent}
+                                imageInputChange={imageInputChange}
+                              />
+                            </Grid>
+                          ) : null;
+                        })}
+                      </Box>
+                    ))}
+                  </>
+                )}
               </Box>
             </React.Fragment>
           ))}
@@ -139,12 +267,7 @@ export const AdminCreatePage = () => {
           <Divider />
           <List>
             {components.map((component, index) => (
-              <ListItem
-                key={component.id}
-                onClick={() => {
-                  onSelectComponent(index);
-                }}
-              >
+              <ListItem key={component.id} onClick={() => onSelectComponent(index)}>
                 <ListItemText primary={component.displayName} />
               </ListItem>
             ))}
