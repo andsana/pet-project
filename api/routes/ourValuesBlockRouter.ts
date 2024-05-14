@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose, { Types } from 'mongoose';
 import OurValuesBlock from '../models/ourValuesBlock/OurValuesBlock';
-import { OurValuesBlockCard, OurValuesBlockMutation } from '../types';
+import { OurValuesBlockCard } from '../types';
 import { imagesUpload } from '../multer';
 
 const ourValuesBlockRouter = express.Router();
