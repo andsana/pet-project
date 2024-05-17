@@ -11,15 +11,28 @@ interface Input {
   value: string | File;
   cardIndex?: number;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number, cardIndex?: number) => void;
-  imageInputChange: (location: string, index: number, cardIndex?: number) => void;
+  imageInputChangeForBlock?: (field: Field, location: string, index: number) => void;
+  imageInputChangeForCard?: (field: Field, location: string, index: number, cardIndex: number) => void;
 }
 
-const InputItem: React.FC<Input> = ({ field, onChange, index, value, cardIndex, imageInputChange }) => {
+const InputItem: React.FC<Input> = ({
+  field,
+  onChange,
+  index,
+  value,
+  cardIndex,
+  imageInputChangeForBlock,
+  imageInputChangeForCard,
+}) => {
   const imageLocation = useAppSelector(selectImageLocation);
 
   useEffect(() => {
-    imageInputChange(imageLocation, index, cardIndex);
-  }, [imageLocation, imageInputChange, index, cardIndex]);
+    if (imageInputChangeForCard && field.typeField === 'image' && cardIndex !== undefined) {
+      imageInputChangeForCard(field, imageLocation, index, cardIndex);
+    } else if (field.typeField === 'image' && imageInputChangeForBlock && cardIndex === undefined) {
+      imageInputChangeForBlock(field, imageLocation, index);
+    }
+  }, [imageLocation]);
 
   const onComponentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onChange(e, index, cardIndex);
@@ -32,7 +45,7 @@ const InputItem: React.FC<Input> = ({ field, onChange, index, value, cardIndex, 
           label={field.placeholder}
           name={field.fieldName}
           required={field.required}
-          value={value}
+          value={value as string}
           onChange={onComponentChange}
           fullWidth
         />
@@ -42,7 +55,7 @@ const InputItem: React.FC<Input> = ({ field, onChange, index, value, cardIndex, 
         <TextField
           label={field.placeholder}
           name={field.fieldName}
-          value={value}
+          value={value as string}
           required={field.required}
           onChange={onComponentChange}
           multiline

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { createPage, fetchOnePage } from '../api/adminCreatePageThunks';
-import { RootState } from '../../../../store/store.ts';
 import { OnePageResponse } from './types';
+import { RootState } from '../../../../store/store';
 
 interface AdminCreatePageState {
   onePage: OnePageResponse | null;

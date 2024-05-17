@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Divider, Grid, List, ListItem, ListItemText, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, List, ListItem, ListItemText, Modal, TextField, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
@@ -8,7 +8,7 @@ import InputBase from '@mui/material/InputBase';
 import { components } from '../../../../app/constants/components';
 import { createPage } from '../api/adminCreatePageThunks';
 import InputItem from '../../../widgets/adminPageCreateForm/InputItem';
-import { Field, IPage, Card, CreatePage } from '../model/types';
+import { Card, CreatePage, Field, IPage } from '../model/types';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../../../store/hooks';
 
@@ -51,29 +51,61 @@ export const AdminCreatePage = () => {
     const { name, value } = e.target;
     const data = [...page];
     data[index].content[name] = value;
+    setPages(data);
   };
 
-  const imageInputChange = (location: string, blockIndex: number, cardIndex?: number) => {
+  const imageInputChangeForBlock = (field: Field, location: string, blockIndex: number) => {
     const data = [...page];
+    const block = components.find((comp) => comp.nameModel === data[blockIndex].nameComponent);
+    console.log('block = ', block);
 
-    if (cardIndex !== undefined) {
-      (data[blockIndex].content.cards as Card[])[cardIndex]['image'] = location;
-    } else {
-      data[blockIndex].content['image'] = location;
+    const fieldName = field.fieldName;
+    console.log('fieldName = ', fieldName);
+
+    if (block) {
+      const fieldKey = Object.keys(block.fields).find((key) => block.fields[key].fieldName === field.fieldName);
+      console.log('fieldKey3 = ', fieldKey);
+
+      if (fieldKey && block.fields[fieldKey].typeField === 'image') {
+        data[blockIndex].content[fieldKey] = location;
+
+        console.log('data[blockIndex].content[fieldKey] = location', location);
+      }
     }
 
-    setPages(data);
+    // setPages(data);
+  };
+
+  const imageInputChangeForCard = (field: Field, location: string, blockIndex: number, cardIndex: number) => {
+    const data = [...page];
+    const block = components.find((comp) => comp.nameModel === data[blockIndex].nameComponent);
+    const fieldName = field.fieldName;
+
+    console.log('fieldName = ', fieldName);
+    console.log('location = ', location);
+
+    if (block) {
+      if (cardIndex !== undefined && fieldName) {
+        const card = (data[blockIndex].content.cards as Card[])[cardIndex];
+        console.log('card =', card); //card = {cardTitle: 'ddcd', cardDescription: 'dcdcdsdddd', cardIcon: 'images/336602eb-cbe2-4404-b389-77e37a73b0aa.jpg'}
+
+        const cardFieldKey = Object.keys(block.card?.fields || {}).find(
+          (key) => block.card?.fields[key].fieldName === fieldName,
+        );
+        console.log('cardFieldKey =', cardFieldKey); //cardIcon
+
+        if (card && cardFieldKey && block.card?.fields[cardFieldKey].typeField === 'image') {
+          card[cardFieldKey] = location;
+          console.log('card[cardFieldKey] = ', card[cardFieldKey]); //card[cardFieldKey] =  images/0520f76d-9d98-40b7-94b9-00b45b252598.jpg
+        }
+      }
+      // setPages(data);
+    }
   };
 
   const addCard = (index: number) => {
     const data = [...page];
-
-    console.log('data[index].nameComponent =', data[index].nameComponent);
-
-    console.log('data before adding card:', JSON.stringify(data, null, 2));
-
     const component = components.find((comp) => comp.nameModel === data[index].nameComponent);
-    console.log('component:', component);
 
     if (!component?.card?.fields) {
       console.error('No card fields found for the component:', data[index].nameComponent);
@@ -85,16 +117,11 @@ export const AdminCreatePage = () => {
       return acc;
     }, {} as Card);
 
-    console.log('newCard:', newCard);
-
     if (!data[index].content.cards) {
       data[index].content.cards = [];
     }
 
     (data[index].content.cards as Card[]).push(newCard);
-
-    console.log('data after adding card:', JSON.stringify(data, null, 2));
-
     setPages(data);
   };
 
@@ -107,19 +134,10 @@ export const AdminCreatePage = () => {
     const data = [...page];
     if (cardIndex !== undefined) {
       (data[blockIndex].content.cards as Card[])[cardIndex][name] = value;
-      console.log('data[blockIndex].content.cards', data[blockIndex].content.cards);
-      console.log(
-        ' (data[blockIndex].content.cards as Card[])[cardIndex]',
-        (data[blockIndex].content.cards as Card[])[cardIndex],
-      );
+    } else {
+      data[blockIndex].content[name] = value;
     }
-    console.log('blockIndex', blockIndex); //1
-    console.log('cardIndex', cardIndex); //0
-    console.log('name', name); // title
-    console.log('value', value); //v
-    console.log('data', data); //пустой массив карточек
     setPages(data);
-    console.log('data2', data);
   };
 
   const areAllRequiredFieldsFilled = (
@@ -155,6 +173,15 @@ export const AdminCreatePage = () => {
     navigate('/admin/pages');
   };
 
+  const handleDeleteComponent = (index: number) => {
+    const updatedBlocks = blocks.filter((_, blockIndex) => blockIndex !== index);
+    const updatedPages = page.filter((_, pageIndex) => pageIndex !== index);
+    const updatedComponentNames = chooseComponentName.filter((_, nameIndex) => nameIndex !== index);
+    setBlocks(updatedBlocks);
+    setPages(updatedPages);
+    setChooseComponentName(updatedComponentNames);
+  };
+
   return (
     <>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -177,7 +204,7 @@ export const AdminCreatePage = () => {
               <Box sx={{ border: '1px solid black', borderRadius: '14px', padding: 1, margin: '10px 0' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-around', margin: '10px 0' }}>
                   <Typography variant="h6">{chooseComponentName[index]}</Typography>
-                  <Button variant="contained" color={'error'}>
+                  <Button variant="contained" color={'error'} onClick={() => handleDeleteComponent(index)}>
                     Delete
                   </Button>
                 </Box>
@@ -191,7 +218,7 @@ export const AdminCreatePage = () => {
                         index={index}
                         value={value}
                         onChange={onChangeComponents}
-                        imageInputChange={imageInputChange}
+                        imageInputChangeForBlock={imageInputChangeForBlock}
                       />
                     </Grid>
                   );
@@ -223,7 +250,7 @@ export const AdminCreatePage = () => {
                                 cardIndex={cardIndex}
                                 value={card[key] as string}
                                 onChange={onChangeCardContent}
-                                imageInputChange={imageInputChange}
+                                imageInputChangeForCard={imageInputChangeForCard}
                               />
                             </Grid>
                           ) : null;
@@ -264,7 +291,6 @@ export const AdminCreatePage = () => {
           <Typography variant="h6" component="h2" gutterBottom>
             Select a Component
           </Typography>
-          <Divider />
           <List>
             {components.map((component, index) => (
               <ListItem key={component.id} onClick={() => onSelectComponent(index)}>
