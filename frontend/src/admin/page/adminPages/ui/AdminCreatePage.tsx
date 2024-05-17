@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, Grid, List, ListItem, ListItemText, Modal, TextField, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
-
 import { components } from '../../../../app/constants/components';
 import { createPage } from '../api/adminCreatePageThunks';
 import InputItem from '../../../widgets/adminPageCreateForm/InputItem';
 import { Card, CreatePage, Field, IPage } from '../model/types';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import { selectImageLocation } from '../model/imageUploadSlice';
 
 interface Fields {
   [key: string]: Field;
@@ -19,12 +19,21 @@ interface Fields {
 export const AdminCreatePage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const imageLocation = useAppSelector(selectImageLocation); // Получаем URL картинки
+  const [currentImageLocation, setCurrentImageLocation] = useState<string>(''); // Добавляем состояние для текущего URL изображения
   const [blocks, setBlocks] = useState<Fields[]>([]);
   const [page, setPages] = useState<IPage[]>([]);
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [openModal, setOpenModal] = useState(false);
   const [chooseComponentName, setChooseComponentName] = useState<string[]>([]);
+
+  // Обновляем currentImageLocation при изменении imageLocation
+  useEffect(() => {
+    if (imageLocation) {
+      setCurrentImageLocation(imageLocation);
+    }
+  }, [imageLocation]);
 
   const onSelectComponent = (index: number) => {
     const selectComponent = components[index];
@@ -67,6 +76,7 @@ export const AdminCreatePage = () => {
     }
 
     setPages(data);
+    setCurrentImageLocation(''); // Обнуляем currentImageLocation после использования
   };
 
   const imageInputChangeForCard = (field: Field, location: string, blockIndex: number, cardIndex: number) => {
@@ -84,6 +94,7 @@ export const AdminCreatePage = () => {
       }
 
       setPages(data);
+      setCurrentImageLocation(''); // Обнуляем currentImageLocation после использования
     }
   };
 
@@ -203,6 +214,8 @@ export const AdminCreatePage = () => {
                         value={value}
                         onChange={onChangeComponents}
                         imageInputChangeForBlock={imageInputChangeForBlock}
+                        imageInputChangeForCard={imageInputChangeForCard}
+                        imageLocation={currentImageLocation} // Передаем currentImageLocation в InputItem
                       />
                     </Grid>
                   );
@@ -234,7 +247,9 @@ export const AdminCreatePage = () => {
                                 cardIndex={cardIndex}
                                 value={card[key] as string}
                                 onChange={onChangeCardContent}
+                                imageInputChangeForBlock={imageInputChangeForBlock}
                                 imageInputChangeForCard={imageInputChangeForCard}
+                                imageLocation={currentImageLocation} // Передаем currentImageLocation в InputItem
                               />
                             </Grid>
                           ) : null;

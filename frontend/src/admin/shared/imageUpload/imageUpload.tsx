@@ -1,28 +1,32 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button, Grid, TextField } from '@mui/material';
 import { fileUpload } from '../../page/adminPages/api/imageUploadThunks';
 import { useAppDispatch } from '../../../store/hooks';
 
 interface Props {
   name: string;
+  onImageUpload: (location: string) => void;
 }
 
-const ImageUpload: React.FC<Props> = ({ name }) => {
+const ImageUpload: React.FC<Props> = ({ name, onImageUpload }) => {
   const dispatch = useAppDispatch();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [state, setState] = useState<File | null>(null);
   const [filename, setFilename] = useState('');
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFilename(e.target.files[0].name);
+      const file = e.target.files[0];
+      setFilename(file.name);
+
+      // Загружаем файл и вызываем onImageUpload с URL изображения
+      try {
+        const result = await dispatch(fileUpload(file)).unwrap();
+        onImageUpload(result); // Передача URL загруженного изображения
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
     } else {
       setFilename('');
-    }
-
-    const { files } = e.target;
-    if (files) {
-      setState(files[0]);
     }
   };
 
@@ -31,12 +35,6 @@ const ImageUpload: React.FC<Props> = ({ name }) => {
       inputRef.current.click();
     }
   };
-
-  useEffect(() => {
-    if (filename.length > 0 && state) {
-      dispatch(fileUpload(state));
-    }
-  }, [filename, dispatch, state]);
 
   return (
     <>
