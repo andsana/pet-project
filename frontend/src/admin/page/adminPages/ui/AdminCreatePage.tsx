@@ -55,51 +55,35 @@ export const AdminCreatePage = () => {
   };
 
   const imageInputChangeForBlock = (field: Field, location: string, blockIndex: number) => {
-    const data = [...page];
+    const data = JSON.parse(JSON.stringify(page));
     const block = components.find((comp) => comp.nameModel === data[blockIndex].nameComponent);
-    console.log('block = ', block);
-
-    const fieldName = field.fieldName;
-    console.log('fieldName = ', fieldName);
 
     if (block) {
       const fieldKey = Object.keys(block.fields).find((key) => block.fields[key].fieldName === field.fieldName);
-      console.log('fieldKey3 = ', fieldKey);
 
       if (fieldKey && block.fields[fieldKey].typeField === 'image') {
         data[blockIndex].content[fieldKey] = location;
-
-        console.log('data[blockIndex].content[fieldKey] = location', location);
       }
     }
 
-    // setPages(data);
+    setPages(data);
   };
 
   const imageInputChangeForCard = (field: Field, location: string, blockIndex: number, cardIndex: number) => {
-    const data = [...page];
+    const data = JSON.parse(JSON.stringify(page));
     const block = components.find((comp) => comp.nameModel === data[blockIndex].nameComponent);
-    const fieldName = field.fieldName;
-
-    console.log('fieldName = ', fieldName);
-    console.log('location = ', location);
 
     if (block) {
-      if (cardIndex !== undefined && fieldName) {
-        const card = (data[blockIndex].content.cards as Card[])[cardIndex];
-        console.log('card =', card); //card = {cardTitle: 'ddcd', cardDescription: 'dcdcdsdddd', cardIcon: 'images/336602eb-cbe2-4404-b389-77e37a73b0aa.jpg'}
+      const card = (data[blockIndex].content.cards as Card[])[cardIndex];
+      const cardFieldKey = Object.keys(block.card?.fields || {}).find(
+        (key) => block.card?.fields[key].fieldName === field.fieldName,
+      );
 
-        const cardFieldKey = Object.keys(block.card?.fields || {}).find(
-          (key) => block.card?.fields[key].fieldName === fieldName,
-        );
-        console.log('cardFieldKey =', cardFieldKey); //cardIcon
-
-        if (card && cardFieldKey && block.card?.fields[cardFieldKey].typeField === 'image') {
-          card[cardFieldKey] = location;
-          console.log('card[cardFieldKey] = ', card[cardFieldKey]); //card[cardFieldKey] =  images/0520f76d-9d98-40b7-94b9-00b45b252598.jpg
-        }
+      if (card && cardFieldKey && block.card?.fields[cardFieldKey].typeField === 'image') {
+        card[cardFieldKey] = location;
       }
-      // setPages(data);
+
+      setPages(data);
     }
   };
 
